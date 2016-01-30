@@ -2,12 +2,14 @@
 using System.Collections;
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
+using DG.Tweening;
 
 public class BallInteraction : MonoBehaviour 
 {
 	GameObject ball;
 	Animator anim;
 	PlayerController player;
+	CylinderController cylinderController;
 
 	public Text pickupText;
 	public Text dropText;
@@ -46,13 +48,30 @@ public class BallInteraction : MonoBehaviour
 
 	public void PutDownRockAlmost()
 	{
+		//todo temp!!!
+		if (carryingBall)
+			return;
+		
 		Vector3 newPos = ball.transform.position;
 		newPos.x = transform.position.x;
 		newPos.z = transform.position.z;
-		newPos += dropOffset;
+
+		if (transform.localScale.x > 0)
+			newPos += dropOffset;
+		else
+			newPos -= dropOffset;
+		
 		ball.transform.position = newPos;
 
 		ball.SetActive(true);
+
+		cylinderController.enabled = false;
+
+		Sequence seq = DOTween.Sequence();
+		seq.Append(cylinderController.transform.DOMove(new Vector3(ball.transform.position.x, 0, ball.transform.position.z), 0.5f));
+		seq.AppendCallback(() => {
+			cylinderController.enabled = true;
+		});
 	}
 
 	public void PutDownRockCompletion()
@@ -62,6 +81,9 @@ public class BallInteraction : MonoBehaviour
 
 	void PickUpRock()
 	{
+		// Snap to rock
+		transform.position = new Vector3(ball.transform.position.x, transform.position.y, ball.transform.position.z);
+
 		player.movementType = MovementType.None;
 
 		anim.SetTrigger("PickUpRock");
@@ -79,6 +101,7 @@ public class BallInteraction : MonoBehaviour
 	{
 		this.ball = GameObject.FindWithTag("Ball");
 		this.player = GetComponent<PlayerController>();
+		this.cylinderController = GameObject.Find("Cylinders").GetComponent<CylinderController>();
 
 		GameObject charSprite = transform.FindChild("Character Sprite").gameObject;
 		anim = charSprite.GetComponent<Animator>();

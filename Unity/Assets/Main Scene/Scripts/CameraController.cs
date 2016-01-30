@@ -9,6 +9,7 @@ public enum CameraMode
 public class CameraController : MonoBehaviour 
 {
 	public CameraMode cameraMode = CameraMode.AboveGround;
+	Transform cylinders;
 	Transform player;
 
 	public Transform pivot;
@@ -20,6 +21,7 @@ public class CameraController : MonoBehaviour
 	void Start () 
 	{
 		this.player = GameObject.FindWithTag("Player").transform;
+		this.cylinders = GameObject.Find("Cylinders").transform;
 	}
 
 	void Update() 
@@ -27,7 +29,7 @@ public class CameraController : MonoBehaviour
 		if (cameraMode == CameraMode.AboveGround)
 		{
 			transform.localEulerAngles = abovegroundRotation;
-			transform.position = player.transform.position + abovegroundOffset;
+			transform.position = cylinders.transform.position + abovegroundOffset;
 		}
 		else if (cameraMode == CameraMode.BelowGround)
 		{

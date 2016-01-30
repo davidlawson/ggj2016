@@ -18,6 +18,8 @@ public class PlayerController : MonoBehaviour
 	Rigidbody rigidBody;
 	CameraController cam;
 
+	Transform cylinders;
+
 	Animator anim;
 	GameObject[] eyeObjects;
 
@@ -61,6 +63,8 @@ public class PlayerController : MonoBehaviour
 		this.rigidBody = GetComponent<Rigidbody>();
 		this.cam = GameObject.FindGameObjectWithTag("MainCamera").GetComponent<CameraController>();
 
+		this.cylinders = GameObject.Find("Cylinders").transform;
+
 		this.eyeObjects = new GameObject[] {
 			transform.FindChild("Left Eye").gameObject,
 			transform.FindChild("Right Eye").gameObject,
@@ -76,7 +80,6 @@ public class PlayerController : MonoBehaviour
 	void Update()
 	{
 		bool idle = anim.GetCurrentAnimatorStateInfo(0).IsName("Base Layer.IdleNoRockAnimation");
-		Debug.Log(idle);
 		ShowMovingEyes(idle);
 	}
 
@@ -122,9 +125,12 @@ public class PlayerController : MonoBehaviour
 		seq.Insert(timeEntrance + timeWait, cam.transform.DOMove(camPoint, timeDescend));
 		seq.Insert(timeEntrance + timeWait, cam.transform.DORotateQuaternion(camRotation, timeDescend));
 
+		seq.Insert(timeEntrance + timeWait, transform.DORotateQuaternion(camRotation, timeDescend));
+
 		seq.AppendCallback(() => {
 			movementType = MovementType.Cylinder;
 			cam.pivot = pivot;
+			cylinderMovement.pivot = pivot;
 			cam.cameraMode = CameraMode.BelowGround;
 		});
 	}
@@ -144,8 +150,10 @@ public class PlayerController : MonoBehaviour
 		seq.AppendInterval(timeWait);
 		seq.Append(transform.DOMove(entrance.exitPoint.position, timeExit));
 
-		seq.Insert(0, cam.transform.DOMove(entrance.exitPoint.position + cam.abovegroundOffset, timeAscend));
+		seq.Insert(0, cam.transform.DOMove(this.cylinders.position + cam.abovegroundOffset, timeAscend));
 		seq.Insert(0, cam.transform.DORotate(cam.abovegroundRotation, timeAscend));
+
+		seq.Insert(0, transform.DORotate(new Vector3(0, 0, 0), timeAscend));
 
 		seq.AppendCallback(() => {
 			movementType = MovementType.Normal;
