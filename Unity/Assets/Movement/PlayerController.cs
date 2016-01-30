@@ -17,7 +17,7 @@ public class PlayerController : MonoBehaviour
 	CylinderMovement cylinderMovement;
 	NormalMovement normalMovement;
 	Rigidbody rigidBody;
-	Camera cam;
+	CameraController cam;
 
 	MovementType _movementType;
 	MovementType movementType
@@ -57,7 +57,7 @@ public class PlayerController : MonoBehaviour
 		this.cylinderMovement = GetComponent<CylinderMovement>();
 		this.normalMovement = GetComponent<NormalMovement>();
 		this.rigidBody = GetComponent<Rigidbody>();
-		this.cam = GameObject.FindGameObjectWithTag("MainCamera").GetComponent<Camera>();
+		this.cam = GameObject.FindGameObjectWithTag("MainCamera").GetComponent<CameraController>();
 
 		movementType = MovementType.Normal;
 	}
@@ -74,6 +74,7 @@ public class PlayerController : MonoBehaviour
 	void EnterUnderground(UndergroundEntrance entrance)
 	{
 		movementType = MovementType.None;
+		cam.cameraMode = CameraMode.Manual;
 
 		WaypointScript waypoint = entrance.firstWaypoint;
 		Transform pivot = waypoint.transform.parent;
@@ -101,12 +102,15 @@ public class PlayerController : MonoBehaviour
 
 		seq.AppendCallback(() => {
 			movementType = MovementType.Cylinder;
+			cam.pivot = pivot;
+			cam.cameraMode = CameraMode.BelowGround;
 		});
 	}
 
 	public void ExitUnderground(UndergroundEntrance entrance)
 	{
 		movementType = MovementType.None;
+		cam.cameraMode = CameraMode.Manual;
 
 		float timeAscend = 1.0f;
 		float timeWait = 0.3f;
@@ -118,11 +122,12 @@ public class PlayerController : MonoBehaviour
 		seq.AppendInterval(timeWait);
 		seq.Append(transform.DOMove(entrance.exitPoint.position, timeExit));
 
-		seq.Insert(0, cam.transform.DOMove(new Vector3(0, 3.4f, -6.66f), timeAscend));
-		seq.Insert(0, cam.transform.DORotate(new Vector3(25, 0, 0), timeAscend));
+		seq.Insert(0, cam.transform.DOMove(entrance.exitPoint.position + cam.abovegroundOffset, timeAscend));
+		seq.Insert(0, cam.transform.DORotate(cam.abovegroundRotation, timeAscend));
 
 		seq.AppendCallback(() => {
 			movementType = MovementType.Normal;
+			cam.cameraMode = CameraMode.AboveGround;
 		});
 	}
 }
