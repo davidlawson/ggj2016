@@ -86,7 +86,7 @@ public class PlayerController : MonoBehaviour
 		ShowMovingEyes(idle);
 	}
 
-	void ShowMovingEyes(bool show)
+	public void ShowMovingEyes(bool show)
 	{
 		for (int i = 0; i < eyeObjects.Length; i++)
 			eyeObjects[i].SetActive(show);

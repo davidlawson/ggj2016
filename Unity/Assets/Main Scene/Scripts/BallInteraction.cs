@@ -11,6 +11,8 @@ public class BallInteraction : MonoBehaviour
 	PlayerController player;
 	CylinderController cylinderController;
 
+	UndergroundTrigger insideTrigger;
+
 	public Text pickupText;
 	public Text dropText;
 
@@ -76,6 +78,11 @@ public class BallInteraction : MonoBehaviour
 
 		cylinderController.enabled = true;
 		transform.DOMove(transform.position - offset, 0.5f);
+
+		if (insideTrigger != null)
+		{
+			insideTrigger.AnimateReveal();
+		}
 	}
 
 	public void PutDownRockCompletion()
@@ -85,6 +92,9 @@ public class BallInteraction : MonoBehaviour
 
 	void PickUpRock()
 	{
+		// quick fix glitch eyes flashing
+		player.ShowMovingEyes(false);
+
 		// Snap to rock
 		transform.position = new Vector3(ball.transform.position.x, transform.position.y, ball.transform.position.z);
 
@@ -94,6 +104,11 @@ public class BallInteraction : MonoBehaviour
 		ball.SetActive(false);
 		canPickup = false;
 		carryingBall = true;
+
+		if (insideTrigger != null)
+		{
+			insideTrigger.AnimateHiding();
+		}
 	}
 
 	public void PickUpRockCompletion()
@@ -133,6 +148,10 @@ public class BallInteraction : MonoBehaviour
 		{
 			canPickup = true;
 		}
+
+		UndergroundTrigger trig = col.GetComponent<UndergroundTrigger>();
+		if (trig)
+			insideTrigger = trig;
 	}
 
 	void OnTriggerStay(Collider col)
@@ -149,5 +168,9 @@ public class BallInteraction : MonoBehaviour
 		{
 			canPickup = false;
 		}
+
+		UndergroundTrigger trig = col.GetComponent<UndergroundTrigger>();
+		if (trig)
+			insideTrigger = null;
 	}
 }
