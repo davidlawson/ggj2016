@@ -5,6 +5,8 @@ public class WaypointScript : MonoBehaviour
 {
 	public WaypointScript leftTarget, rightTarget, upTarget, downTarget;
 	public UndergroundEntrance upExit;
+	public bool ropeOnLeft;
+	public bool isGem;
 
 	public Vector2 GetDirection(Direction direction)
 	{
@@ -33,6 +35,11 @@ public class WaypointScript : MonoBehaviour
 		float r = GetRadius();
 		float theta = Mathf.Atan2(target.transform.localPosition.z, target.transform.localPosition.x)
 		              - Mathf.Atan2(transform.localPosition.z, transform.localPosition.x);
+
+		if (theta < -Mathf.PI)
+			theta += Mathf.PI * 2;
+		else if (theta > Mathf.PI)
+			theta -= Mathf.PI * 2;
 
 		return new Vector2(
 			-r * theta,

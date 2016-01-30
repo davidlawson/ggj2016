@@ -1,26 +1,70 @@
 ﻿using UnityEngine;
 using System.Collections;
+using DG.Tweening;
 
 public class CylinderMovement : MonoBehaviour 
 {
 	public Transform pivot;
 
-	public float movementSpeed;
+	public float upDownSpeed = 0.08f, leftRightSpeed = 0.04f;
 
 	Vector2 movementDirection;
 	Direction controlDirection;
 
-	WaypointScript currentWaypoint = null;
+	public WaypointScript currentWaypoint = null;
+
+	public WaypointScript waypointQuickFix = null;
 
 	bool canCollide = true;
 
 	PlayerController player;
+	Animator anim;
+
+	public Direction currentDirection;
+
+	SoundController soundController;
+
+	Transform ballTransform;
+	BallInteraction ballInteraction;
+	CameraController cameraController;
+
+	bool shouldTeleport;
+
+	void Start()
+	{
+		this.player = GetComponent<PlayerController>();
+		this.soundController = GetComponent<SoundController>();
+		this.ballTransform = GameObject.FindWithTag("Ball").transform;
+		this.ballInteraction = GetComponent<BallInteraction>();
+		this.cameraController = Camera.main.GetComponent<CameraController>();
+
+		GameObject charSprite = transform.GetChild(0).FindChild("Character Sprite").gameObject;
+		anim = charSprite.GetComponent<Animator>();
+	}
+
+	void OnTriggerEnter(Collider other)
+	{
+		if (!this.enabled)
+			return;
+
+		WaypointScript waypoint = other.GetComponent<WaypointScript>();
+
+		if (!waypoint)
+			return;
+
+		waypointQuickFix = waypoint;
+	}
 
 	void OnTriggerStay(Collider other)
 	{
 		if (!this.enabled)
 			return;
-		
+
+		WaypointScript waypoint = other.GetComponent<WaypointScript>();
+
+		if (!waypoint)
+			return;
+
 		if (canCollide)
 		{
 			float distance = (other.transform.position - transform.position).magnitude;
@@ -37,6 +81,8 @@ public class CylinderMovement : MonoBehaviour
 	{
 		if (!this.enabled)
 			return;
+
+		waypointQuickFix = null;
 		
 		canCollide = true;
 	}
@@ -47,25 +93,54 @@ public class CylinderMovement : MonoBehaviour
 
 		currentWaypoint = other.GetComponent<WaypointScript>();
 		transform.position = currentWaypoint.transform.position;
+
+		if (currentWaypoint.isGem)
+		{
+			shouldTeleport = true;
+		}
 	}
 
-	void Start()
+	void LateUpdate()
 	{
-		this.player = GetComponent<PlayerController>();
+		if (shouldTeleport)
+		{
+			anim.SetBool("Walking", false);
+			anim.SetBool("Climbing", false);
+
+			player.movementType = MovementType.None;
+			this.cameraController.cameraMode = CameraMode.Manual;
+
+			Sequence seq = DOTween.Sequence();
+			seq.Append(this.cameraController.GetComponent<Camera>().DOShakePosition(2.0f, 2, 20));
+			seq.AppendCallback(() => {
+				player.transform.position = ballTransform.position - ballInteraction.dropOffset;
+				player.transform.GetChild(0).localScale = Vector3.one;
+				player.transform.localEulerAngles = Vector3.zero;
+
+				anim.SetTrigger("ReturnedToGround");
+
+				this.cameraController.cameraMode = CameraMode.AboveGround;
+				player.movementType = MovementType.Normal;
+			});
+
+			soundController.PlayTeleport();
+
+			shouldTeleport = false;
+		}
 	}
 
 	Direction GetInputDirection()
 	{
 		Direction dir = Direction.None;
 
-		if (Input.GetKey("left") || Input.GetKey("a"))
-			dir = Direction.Left;
-		else if (Input.GetKey("right") || Input.GetKey("d"))
-			dir = Direction.Right;
-		else if (Input.GetKey("up") || Input.GetKey("w"))
+		if (Input.GetKey("up") || Input.GetKey("w"))
 			dir = Direction.Up;
 		else if (Input.GetKey("down") || Input.GetKey("s"))
 			dir = Direction.Down;
+		else if (Input.GetKey("left") || Input.GetKey("a"))
+			dir = Direction.Left;
+		else if (Input.GetKey("right") || Input.GetKey("d"))
+			dir = Direction.Right;
 
 		return dir;
 	}
@@ -73,6 +148,19 @@ public class CylinderMovement : MonoBehaviour
 	void FixedUpdate()
 	{
 		Direction dir = GetInputDirection();
+
+		if (waypointQuickFix && waypointQuickFix.leftTarget && waypointQuickFix.rightTarget && waypointQuickFix.upTarget && dir == Direction.Up)
+		{
+			transform.position = waypointQuickFix.transform.position;
+			currentWaypoint = waypointQuickFix;
+			waypointQuickFix = null;
+		}
+		else if (waypointQuickFix && waypointQuickFix.leftTarget && waypointQuickFix.rightTarget && waypointQuickFix.downTarget && dir == Direction.Down)
+		{
+			transform.position = waypointQuickFix.transform.position;
+			currentWaypoint = waypointQuickFix;
+			waypointQuickFix = null;
+		}
 
 		if (currentWaypoint != null)
 		{
@@ -89,6 +177,11 @@ public class CylinderMovement : MonoBehaviour
 				{
 					//Debug.Log("Leaving Waypoint");
 
+					if (dir == Direction.Up || dir == Direction.Down)
+					{
+						transform.localScale = new Vector3(currentWaypoint.ropeOnLeft ? 1 : -1, 1, 1);
+					}
+
 					movementDirection = possibleDirection;
 					controlDirection = dir;
 					currentWaypoint = null;
@@ -101,14 +194,66 @@ public class CylinderMovement : MonoBehaviour
 			if (dir == controlDirection)
 			{
 				//Debug.Log("Moving Fowards");
-				Move(movementDirection);
+
+				if (dir == Direction.Up || dir == Direction.Down)
+					Move(movementDirection * upDownSpeed);
+				else
+					Move(movementDirection * leftRightSpeed);
+				
+				AnimateMove(dir);
 			}
 			else if (dir == controlDirection.Opposite())
 			{
 				//Debug.Log("Moving Backwards");
 				canCollide = true;
-				Move(-movementDirection);
+
+				if (dir == Direction.Up || dir == Direction.Down)
+					Move(-movementDirection * upDownSpeed);
+				else
+					Move(-movementDirection * leftRightSpeed);
+
+				AnimateMove(dir);
 			}
+		}
+
+		if (dir == Direction.None)
+		{
+			AnimateMove(dir);
+		}
+	}
+
+	void AnimateMove(Direction dir)
+	{
+		this.currentDirection = dir;
+
+		if (dir == Direction.Up)
+		{
+			anim.SetBool("Walking", false);
+			anim.SetBool("Climbing", true);
+			anim.SetBool("ClimbingUp", true);
+		}
+		else if (dir == Direction.Down)
+		{
+			anim.SetBool("Walking", false);
+			anim.SetBool("Climbing", true);
+			anim.SetBool("ClimbingUp", false);
+		}
+		else if (dir == Direction.Left)
+		{
+			anim.SetBool("Climbing", false);
+			anim.SetBool("Walking", true);
+			transform.localScale = new Vector3(-1, 1, 1);
+		}
+		else if (dir == Direction.Right)
+		{
+			anim.SetBool("Climbing", false);
+			anim.SetBool("Walking", true);
+			transform.localScale = new Vector3(1, 1, 1);
+		}
+		else
+		{
+			anim.SetBool("Climbing", false);
+			anim.SetBool("Walking", false);
 		}
 	}
 
@@ -116,9 +261,9 @@ public class CylinderMovement : MonoBehaviour
 	{
 		float radius = pivot.localScale.x / 2;
 
-		float radialSpeed = movementSpeed / radius;
+		float radialSpeed = 1.0f / radius;
 
 		transform.RotateAround(this.pivot.position, Vector3.up, radialSpeed * direction.x * Mathf.Rad2Deg);
-		transform.Translate(new Vector3(0, direction.y * this.movementSpeed, 0));
+		transform.Translate(new Vector3(0, direction.y, 0));
 	}
 }

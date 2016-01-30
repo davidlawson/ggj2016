@@ -2,12 +2,18 @@
 using System.Collections;
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
+using DG.Tweening;
 
 public class BallInteraction : MonoBehaviour 
 {
 	GameObject ball;
 	Animator anim;
 	PlayerController player;
+	CylinderController cylinderController;
+
+	SoundController soundController;
+
+	UndergroundTrigger insideTrigger;
 
 	public Text pickupText;
 	public Text dropText;
@@ -25,23 +31,45 @@ public class BallInteraction : MonoBehaviour
 
 		get { return _canPickup; }
 	}
+		
+	public bool carryingBall;
 
-	bool _carryingBall;
-	bool carryingBall
+	void Start()
 	{
-		get { return _carryingBall; }
-		set
-		{
-			_carryingBall = value;
-			this.dropText.enabled = _carryingBall;
-		}
+		this.ball = GameObject.FindWithTag("Ball");
+		this.player = GetComponent<PlayerController>();
+		this.cylinderController = GameObject.Find("Cylinders").GetComponent<CylinderController>();
+		this.soundController = GetComponent<SoundController>();
+
+		GameObject charSprite = transform.GetChild(0).FindChild("Character Sprite").gameObject;
+		anim = charSprite.GetComponent<Animator>();
 	}
 
 	void PutDownRock()
 	{
+		soundController.PlayPutDownBall();
+
 		carryingBall = false;
+		this.dropText.enabled = false;
 		player.movementType = MovementType.None;
 		anim.SetTrigger("PutDownRock");
+
+		Vector3 newPos = ball.transform.position;
+		newPos.x = transform.position.x;
+		newPos.y = cylinderController.transform.position.y;
+		newPos.z = transform.position.z;
+
+		Vector3 offset;
+
+		if (transform.localScale.x > 0)
+			offset = dropOffset;
+		else
+			offset = -dropOffset;
+
+		newPos += offset;
+
+		cylinderController.enabled = false;
+		cylinderController.transform.DOMove(newPos, 1.0f);
 	}
 
 	public void PutDownRockAlmost()
@@ -49,10 +77,27 @@ public class BallInteraction : MonoBehaviour
 		Vector3 newPos = ball.transform.position;
 		newPos.x = transform.position.x;
 		newPos.z = transform.position.z;
-		newPos += dropOffset;
+
+		Vector3 offset;
+
+		if (transform.localScale.x > 0)
+			offset = dropOffset;
+		else
+			offset = -dropOffset;
+
+		newPos += offset;
+		
 		ball.transform.position = newPos;
 
 		ball.SetActive(true);
+
+		cylinderController.enabled = true;
+		transform.DOMove(transform.position - offset, 0.5f);
+
+		if (insideTrigger != null)
+		{
+			insideTrigger.AnimateReveal();
+		}
 	}
 
 	public void PutDownRockCompletion()
@@ -62,26 +107,31 @@ public class BallInteraction : MonoBehaviour
 
 	void PickUpRock()
 	{
+		soundController.PlayPickupBall();
+
+		// quick fix glitch eyes flashing
+		player.ShowMovingEyes(false);
+
+		// Snap to rock
+		transform.position = new Vector3(ball.transform.position.x, transform.position.y, ball.transform.position.z);
+
 		player.movementType = MovementType.None;
 
 		anim.SetTrigger("PickUpRock");
 		ball.SetActive(false);
 		canPickup = false;
 		carryingBall = true;
+
+		if (insideTrigger != null)
+		{
+			insideTrigger.AnimateHiding();
+		}
 	}
 
 	public void PickUpRockCompletion()
 	{
 		player.movementType = MovementType.Normal;
-	}
-
-	void Start()
-	{
-		this.ball = GameObject.FindWithTag("Ball");
-		this.player = GetComponent<PlayerController>();
-
-		GameObject charSprite = transform.FindChild("Character Sprite").gameObject;
-		anim = charSprite.GetComponent<Animator>();
+		this.dropText.enabled = true;
 	}
 
 	void Update()
@@ -105,6 +155,10 @@ public class BallInteraction : MonoBehaviour
 		{
 			canPickup = true;
 		}
+
+		UndergroundTrigger trig = col.GetComponent<UndergroundTrigger>();
+		if (trig)
+			insideTrigger = trig;
 	}
 
 	void OnTriggerStay(Collider col)
@@ -121,5 +175,9 @@ public class BallInteraction : MonoBehaviour
 		{
 			canPickup = false;
 		}
+
+		UndergroundTrigger trig = col.GetComponent<UndergroundTrigger>();
+		if (trig)
+			insideTrigger = null;
 	}
 }

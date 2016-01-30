@@ -5,7 +5,7 @@ using UnityEditor;
 [CustomEditor(typeof(WaypointScript))]
 public class WaypointEditor : Editor 
 {
-	float movementAmount = 1.0f;
+	float movementAmount = 0.02f;
 
 	public override void OnInspectorGUI()
 	{

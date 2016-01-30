@@ -9,7 +9,10 @@ public class NormalMovement : MonoBehaviour
 	Rigidbody rb;
 	Animator anim;
 
-	public float speed = 10.0f;
+	BallInteraction ballInteraction;
+
+	public float speedWithBall = 4.0f;
+	public float speedWithoutBall = 7.0f;
 	public float gravity = 20.0f;
 	public float maxVelocityChange = 1.0f;
 
@@ -21,10 +24,11 @@ public class NormalMovement : MonoBehaviour
 
 	void Awake() 
 	{
-		GameObject charSprite = transform.FindChild("Character Sprite").gameObject;
+		GameObject charSprite = transform.GetChild(0).FindChild("Character Sprite").gameObject;
 
 		rb = GetComponent<Rigidbody>();
 		anim = charSprite.GetComponent<Animator>();
+		ballInteraction = GetComponent<BallInteraction>();
 	}
 	
 	void FixedUpdate()
@@ -46,19 +50,13 @@ public class NormalMovement : MonoBehaviour
 				{
 					transform.localScale = new Vector3(-1, 1, 1);
 				}
-
-				if (targetVelocity.z > 0)
-				{
-					anim.SetBool("FacingAway", true);	
-				}
-				else
-				{
-					anim.SetBool("FacingAway", false);
-				}
+					
+				anim.SetBool("FacingAway", targetVelocity.z > 0);	
+				anim.SetBool("MovingSideways", targetVelocity.x > 0 || targetVelocity.x < 0);
 
 				targetVelocity.Normalize();
 				//targetVelocity = transform.TransformDirection(targetVelocity);
-				targetVelocity *= speed;
+				targetVelocity *= ballInteraction.carryingBall ? speedWithBall : speedWithoutBall;
 
 				// Apply a force that attempts to reach our target velocity
 				Vector3 velocity = rb.velocity;
@@ -84,24 +82,5 @@ public class NormalMovement : MonoBehaviour
 	{
 		if (collisionInfo.gameObject.layer == LayerMask.NameToLayer("Terrain"))
 			grounded = true;    
-	}
-
-	public static float ClampAngle(
-		float currentValue,
-		float minAngle,
-		float maxAngle,
-		float clampAroundAngle = 0) 
-	{
-		float angle = currentValue - (clampAroundAngle + 180);
-		
-		while (angle < 0)
-			angle += 360;
-		
-		angle = Mathf.Repeat(angle, 360);
-		
-		return Mathf.Clamp(
-			angle - 180,
-			minAngle,
-			maxAngle) + 360 + clampAroundAngle;
 	}
 }

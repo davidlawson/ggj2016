@@ -13,10 +13,14 @@ public enum MovementType
 
 public class PlayerController : MonoBehaviour 
 {
+	public float insideScale = 0.7f;
+
 	CylinderMovement cylinderMovement;
 	NormalMovement normalMovement;
 	Rigidbody rigidBody;
 	CameraController cam;
+
+	Transform cylinders;
 
 	Animator anim;
 	GameObject[] eyeObjects;
@@ -61,13 +65,15 @@ public class PlayerController : MonoBehaviour
 		this.rigidBody = GetComponent<Rigidbody>();
 		this.cam = GameObject.FindGameObjectWithTag("MainCamera").GetComponent<CameraController>();
 
+		this.cylinders = GameObject.Find("Cylinders").transform;
+
 		this.eyeObjects = new GameObject[] {
-			transform.FindChild("Left Eye").gameObject,
-			transform.FindChild("Right Eye").gameObject,
-			transform.FindChild("Eye Whites Sprite").gameObject
+			transform.GetChild(0).FindChild("Left Eye").gameObject,
+			transform.GetChild(0).FindChild("Right Eye").gameObject,
+			transform.GetChild(0).FindChild("Eye Whites Sprite").gameObject
 		};
 
-		GameObject charSprite = transform.FindChild("Character Sprite").gameObject;
+		GameObject charSprite = transform.GetChild(0).FindChild("Character Sprite").gameObject;
 		anim = charSprite.GetComponent<Animator>();
 
 		movementType = MovementType.Normal;
@@ -75,12 +81,12 @@ public class PlayerController : MonoBehaviour
 
 	void Update()
 	{
-		bool idle = anim.GetCurrentAnimatorStateInfo(0).IsName("Base Layer.IdleNoRockAnimation");
-		Debug.Log(idle);
+		bool idle = anim.GetCurrentAnimatorStateInfo(0).IsName("Base Layer.IdleNoRockAnimation")
+			|| anim.GetCurrentAnimatorStateInfo(0).IsName("Base Layer.IdleUnderground");
 		ShowMovingEyes(idle);
 	}
 
-	void ShowMovingEyes(bool show)
+	public void ShowMovingEyes(bool show)
 	{
 		for (int i = 0; i < eyeObjects.Length; i++)
 			eyeObjects[i].SetActive(show);
@@ -104,12 +110,12 @@ public class PlayerController : MonoBehaviour
 		Transform pivot = waypoint.transform.parent;
 
 		float timeEntrance = 0.2f;
-		float timeWait = 0.3f;
+		float timeWait = 0.0f;
 		float timeDescend = 1.0f;
 
 		Sequence seq = DOTween.Sequence();
 		seq.Append(transform.DOMove(entrance.transform.position, timeEntrance));
-		seq.AppendInterval(timeWait);
+		//seq.AppendInterval(timeWait);
 		seq.Append(transform.DOMove(waypoint.transform.position, timeDescend));
 
 		Vector3 waypointPos = waypoint.transform.position;
@@ -122,10 +128,26 @@ public class PlayerController : MonoBehaviour
 		seq.Insert(timeEntrance + timeWait, cam.transform.DOMove(camPoint, timeDescend));
 		seq.Insert(timeEntrance + timeWait, cam.transform.DORotateQuaternion(camRotation, timeDescend));
 
+		seq.Insert(timeEntrance + timeWait, transform.DORotateQuaternion(camRotation, timeDescend));
+
+		seq.Insert(timeEntrance + timeWait, transform.GetChild(0).DOScale(this.insideScale, timeDescend));
+
+		seq.InsertCallback(timeEntrance + timeWait, () => {
+			anim.SetBool("Walking", false);
+			anim.SetBool("Climbing", true);
+			anim.SetBool("ClimbingUp", false);
+			anim.SetTrigger("BeginClimbing");
+
+			transform.localScale = new Vector3(waypoint.ropeOnLeft ? 1 : -1, 1, 1);
+		});
+
 		seq.AppendCallback(() => {
+			anim.SetBool("Climbing", false);
 			movementType = MovementType.Cylinder;
 			cam.pivot = pivot;
+			cylinderMovement.pivot = pivot;
 			cam.cameraMode = CameraMode.BelowGround;
+			cylinderMovement.currentWaypoint = waypoint;
 		});
 	}
 
@@ -135,17 +157,26 @@ public class PlayerController : MonoBehaviour
 		cam.cameraMode = CameraMode.Manual;
 
 		float timeAscend = 1.0f;
-		float timeWait = 0.3f;
 		float timeExit = 0.5f;
+
+		anim.SetBool("Climbing", true);
+		anim.SetBool("ClimbingUp", true);
 
 		Sequence seq = DOTween.Sequence();
 
 		seq.Append(transform.DOMove(entrance.transform.position, timeAscend));
-		seq.AppendInterval(timeWait);
 		seq.Append(transform.DOMove(entrance.exitPoint.position, timeExit));
 
-		seq.Insert(0, cam.transform.DOMove(entrance.exitPoint.position + cam.abovegroundOffset, timeAscend));
+		seq.Insert(0, cam.transform.DOMove(this.cylinders.position + cam.abovegroundOffset, timeAscend));
 		seq.Insert(0, cam.transform.DORotate(cam.abovegroundRotation, timeAscend));
+
+		seq.Insert(0, transform.DORotate(Vector3.zero, timeAscend));
+
+		seq.Insert(0, transform.GetChild(0).DOScale(1.0f, timeAscend));
+
+		seq.InsertCallback(timeAscend, () => {
+			anim.SetTrigger("ReturnedToGround");
+		});
 
 		seq.AppendCallback(() => {
 			movementType = MovementType.Normal;
