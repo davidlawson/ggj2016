@@ -23,6 +23,11 @@ public class EyeMovement : MonoBehaviour {
 			movement = movement.normalized * maxDistance;
 		}
 
+		if (this.transform.parent.localScale.x < 0)
+		{
+			movement.x *= -1;
+		}
+
 		this.eye.transform.localPosition = movement;
 	}
 }
