@@ -6,9 +6,16 @@ public class BeginController : MonoBehaviour {
 
 	public CanvasGroup beginScreen;
 
+	void Start()
+	{
+		beginScreen.alpha = 1.0f;
+	}
+
 	public void BeginGame()
 	{
-		//Sequence seq = DOTween.Sequence();
-		beginScreen.DOFade(0.0f, 3.0f);
+		beginScreen.interactable = false;
+		beginScreen.DOFade(0.0f, 1.0f);
+
+		GameObject.FindWithTag("Player").GetComponent<PlayerController>().movementType = MovementType.Normal;
 	}
 }

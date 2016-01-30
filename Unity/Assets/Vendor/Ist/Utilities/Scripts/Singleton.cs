@@ -34,8 +34,8 @@ namespace Ist
                 }
                 else
                 {
-                    Debug.Log("[Singleton] Using instance already created: " +
-                        s_instance.gameObject.name);
+                    //Debug.Log("[Singleton] Using instance already created: " +
+                    //    s_instance.gameObject.name);
                 }
             }
 
