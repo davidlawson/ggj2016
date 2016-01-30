@@ -17,6 +17,8 @@ public class CylinderMovement : MonoBehaviour
 	PlayerController player;
 	Animator anim;
 
+	public Direction currentDirection;
+
 	void OnTriggerStay(Collider other)
 	{
 		if (!this.enabled)
@@ -130,6 +132,8 @@ public class CylinderMovement : MonoBehaviour
 
 	void AnimateMove(Direction dir)
 	{
+		this.currentDirection = dir;
+
 		if (dir == Direction.Up)
 		{
 			anim.SetBool("Walking", false);

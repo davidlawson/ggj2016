@@ -9,6 +9,8 @@ public class UndergroundTrigger : MonoBehaviour
 	public MeshRenderer insideRenderer;
 	public Transform outsideTransform;
 
+	public GameObject entrance;
+
 	// Use this for initialization
 	void Start() 
 	{
@@ -25,6 +27,8 @@ public class UndergroundTrigger : MonoBehaviour
 			
 			mat.DOFloat(1 - 16, "_WorldClip", 3.0f);
 		}
+
+		entrance.SetActive(true);
 	}
 
 	public void AnimateHiding()
@@ -37,5 +41,7 @@ public class UndergroundTrigger : MonoBehaviour
 
 			mat.DOFloat(1, "_WorldClip", 3.0f);
 		}
+
+		entrance.SetActive(false);
 	}
 }

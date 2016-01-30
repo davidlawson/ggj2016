@@ -11,6 +11,8 @@ public class BallInteraction : MonoBehaviour
 	PlayerController player;
 	CylinderController cylinderController;
 
+	SoundController soundController;
+
 	UndergroundTrigger insideTrigger;
 
 	public Text pickupText;
@@ -30,10 +32,23 @@ public class BallInteraction : MonoBehaviour
 		get { return _canPickup; }
 	}
 		
-	bool carryingBall;
+	public bool carryingBall;
+
+	void Start()
+	{
+		this.ball = GameObject.FindWithTag("Ball");
+		this.player = GetComponent<PlayerController>();
+		this.cylinderController = GameObject.Find("Cylinders").GetComponent<CylinderController>();
+		this.soundController = GetComponent<SoundController>();
+
+		GameObject charSprite = transform.GetChild(0).FindChild("Character Sprite").gameObject;
+		anim = charSprite.GetComponent<Animator>();
+	}
 
 	void PutDownRock()
 	{
+		soundController.PlayPutDownBall();
+
 		carryingBall = false;
 		this.dropText.enabled = false;
 		player.movementType = MovementType.None;
@@ -92,6 +107,8 @@ public class BallInteraction : MonoBehaviour
 
 	void PickUpRock()
 	{
+		soundController.PlayPickupBall();
+
 		// quick fix glitch eyes flashing
 		player.ShowMovingEyes(false);
 
@@ -115,16 +132,6 @@ public class BallInteraction : MonoBehaviour
 	{
 		player.movementType = MovementType.Normal;
 		this.dropText.enabled = true;
-	}
-
-	void Start()
-	{
-		this.ball = GameObject.FindWithTag("Ball");
-		this.player = GetComponent<PlayerController>();
-		this.cylinderController = GameObject.Find("Cylinders").GetComponent<CylinderController>();
-
-		GameObject charSprite = transform.GetChild(0).FindChild("Character Sprite").gameObject;
-		anim = charSprite.GetComponent<Animator>();
 	}
 
 	void Update()

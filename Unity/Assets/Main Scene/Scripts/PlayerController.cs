@@ -110,12 +110,12 @@ public class PlayerController : MonoBehaviour
 		Transform pivot = waypoint.transform.parent;
 
 		float timeEntrance = 0.2f;
-		float timeWait = 0.3f;
+		float timeWait = 0.0f;
 		float timeDescend = 1.0f;
 
 		Sequence seq = DOTween.Sequence();
 		seq.Append(transform.DOMove(entrance.transform.position, timeEntrance));
-		seq.AppendInterval(timeWait);
+		//seq.AppendInterval(timeWait);
 		seq.Append(transform.DOMove(waypoint.transform.position, timeDescend));
 
 		Vector3 waypointPos = waypoint.transform.position;
@@ -156,7 +156,7 @@ public class PlayerController : MonoBehaviour
 		cam.cameraMode = CameraMode.Manual;
 
 		float timeAscend = 1.0f;
-		float timeWait = 0.3f;
+		float timeWait = 0.0f;
 		float timeExit = 0.5f;
 
 		anim.SetBool("Climbing", true);
@@ -165,7 +165,7 @@ public class PlayerController : MonoBehaviour
 		Sequence seq = DOTween.Sequence();
 
 		seq.Append(transform.DOMove(entrance.transform.position, timeAscend));
-		seq.AppendInterval(timeWait);
+		//seq.AppendInterval(timeWait);
 		seq.Append(transform.DOMove(entrance.exitPoint.position, timeExit));
 
 		seq.Insert(0, cam.transform.DOMove(this.cylinders.position + cam.abovegroundOffset, timeAscend));
