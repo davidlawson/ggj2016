@@ -1,0 +1,11 @@
+fileFormatVersion: 2
+guid: 6accf2be036984542b8d97ef078b41df
+timeCreated: 1454134285
+licenseType: Pro
+ShaderImporter:
+  defaultTextures:
+  - _RealTex: {fileID: 2800000, guid: a4a883b00d5a03c4191f41d61ff430fe, type: 3}
+  - _MainTex: {fileID: 2800000, guid: 71b4c540c5eb54a48935ddb991c71657, type: 3}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

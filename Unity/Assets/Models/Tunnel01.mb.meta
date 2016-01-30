@@ -9,16 +9,54 @@ ModelImporter:
     100002: curve1
     100004: pCylinder1
     100006: //RootNode
+    100008: pCube1
+    100010: pCube2
+    100012: transform1
+    100014: transform2
+    100016: WorldCube
+    100018: Tunnel
+    100020: WorldCube2
+    100022: NewCylinder
+    100024: NewCylinder1
+    100026: Tunnel01Cylinder
     400000: Cave
     400002: curve1
     400004: pCylinder1
     400006: //RootNode
+    400008: pCube1
+    400010: pCube2
+    400012: transform1
+    400014: transform2
+    400016: WorldCube
+    400018: Tunnel
+    400020: WorldCube2
+    400022: NewCylinder
+    400024: NewCylinder1
+    400026: Tunnel01Cylinder
     2300000: Cave
     2300002: pCylinder1
+    2300004: pCube2
+    2300006: WorldCube
+    2300008: Tunnel
+    2300010: WorldCube2
+    2300012: NewCylinder
+    2300014: Tunnel01Cylinder
     3300000: Cave
     3300002: pCylinder1
+    3300004: pCube2
+    3300006: WorldCube
+    3300008: Tunnel
+    3300010: WorldCube2
+    3300012: NewCylinder
+    3300014: Tunnel01Cylinder
     4300000: pCylinder1
     4300002: Cave
+    4300004: pCube2
+    4300006: WorldCube
+    4300008: Tunnel
+    4300010: WorldCube2
+    4300012: NewCylinder
+    4300014: Tunnel01Cylinder
     9500000: //RootNode
   materials:
     importMaterials: 1
@@ -51,7 +89,7 @@ ModelImporter:
     swapUVChannels: 0
     generateSecondaryUV: 0
     useFileUnits: 1
-    optimizeMeshForGPU: 1
+    optimizeMeshForGPU: 0
     keepQuads: 0
     weldVertices: 1
     secondaryUVAngleDistortion: 8
@@ -62,7 +100,7 @@ ModelImporter:
   tangentSpace:
     normalSmoothAngle: 60
     normalImportMode: 0
-    tangentImportMode: 3
+    tangentImportMode: 0
   importAnimation: 1
   copyAvatar: 0
   humanDescription:
