@@ -14,7 +14,8 @@ public class SoundController : MonoBehaviour
 
 	public AudioClip walkWithBall, walkWithoutBall,
 		pickUpBall, putDownBall,
-		walkUnderground;
+		walkUnderground,
+		teleport;
 
 	void Start()
 	{
@@ -76,5 +77,10 @@ public class SoundController : MonoBehaviour
 	public void PlayPutDownBall()
 	{
 		oneShotAudioSource.PlayOneShot(putDownBall);
+	}
+
+	public void PlayTeleport()
+	{
+		oneShotAudioSource.PlayOneShot(teleport);
 	}
 }

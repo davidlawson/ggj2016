@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
+using DG.Tweening;
 
 public class CylinderMovement : MonoBehaviour 
 {
@@ -10,7 +11,7 @@ public class CylinderMovement : MonoBehaviour
 	Vector2 movementDirection;
 	Direction controlDirection;
 
-	WaypointScript currentWaypoint = null;
+	public WaypointScript currentWaypoint = null;
 
 	bool canCollide = true;
 
@@ -18,6 +19,26 @@ public class CylinderMovement : MonoBehaviour
 	Animator anim;
 
 	public Direction currentDirection;
+
+	SoundController soundController;
+
+	Transform ballTransform;
+	BallInteraction ballInteraction;
+	CameraController cameraController;
+
+	bool shouldTeleport;
+
+	void Start()
+	{
+		this.player = GetComponent<PlayerController>();
+		this.soundController = GetComponent<SoundController>();
+		this.ballTransform = GameObject.FindWithTag("Ball").transform;
+		this.ballInteraction = GetComponent<BallInteraction>();
+		this.cameraController = Camera.main.GetComponent<CameraController>();
+
+		GameObject charSprite = transform.GetChild(0).FindChild("Character Sprite").gameObject;
+		anim = charSprite.GetComponent<Animator>();
+	}
 
 	void OnTriggerStay(Collider other)
 	{
@@ -50,14 +71,38 @@ public class CylinderMovement : MonoBehaviour
 
 		currentWaypoint = other.GetComponent<WaypointScript>();
 		transform.position = currentWaypoint.transform.position;
+
+		if (currentWaypoint.isGem)
+		{
+			shouldTeleport = true;
+		}
 	}
 
-	void Start()
+	void LateUpdate()
 	{
-		this.player = GetComponent<PlayerController>();
+		if (shouldTeleport)
+		{
+			anim.SetBool("Walking", false);
+			anim.SetBool("Climbing", false);
 
-		GameObject charSprite = transform.GetChild(0).FindChild("Character Sprite").gameObject;
-		anim = charSprite.GetComponent<Animator>();
+			player.movementType = MovementType.None;
+			this.cameraController.cameraMode = CameraMode.Manual;
+
+			Sequence seq = DOTween.Sequence();
+			seq.Append(this.cameraController.GetComponent<Camera>().DOShakePosition(2.0f, 2, 20));
+			seq.AppendCallback(() => {
+				player.transform.position = ballTransform.position - ballInteraction.dropOffset;
+				player.transform.GetChild(0).localScale = Vector3.one;
+				player.transform.localEulerAngles = Vector3.zero;
+
+				this.cameraController.cameraMode = CameraMode.AboveGround;
+				player.movementType = MovementType.Normal;
+			});
+
+			soundController.PlayTeleport();
+
+			shouldTeleport = false;
+		}
 	}
 
 	Direction GetInputDirection()

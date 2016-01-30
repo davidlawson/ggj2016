@@ -147,6 +147,7 @@ public class PlayerController : MonoBehaviour
 			cam.pivot = pivot;
 			cylinderMovement.pivot = pivot;
 			cam.cameraMode = CameraMode.BelowGround;
+			cylinderMovement.currentWaypoint = waypoint;
 		});
 	}
 
@@ -156,7 +157,6 @@ public class PlayerController : MonoBehaviour
 		cam.cameraMode = CameraMode.Manual;
 
 		float timeAscend = 1.0f;
-		float timeWait = 0.0f;
 		float timeExit = 0.5f;
 
 		anim.SetBool("Climbing", true);
@@ -165,13 +165,12 @@ public class PlayerController : MonoBehaviour
 		Sequence seq = DOTween.Sequence();
 
 		seq.Append(transform.DOMove(entrance.transform.position, timeAscend));
-		//seq.AppendInterval(timeWait);
 		seq.Append(transform.DOMove(entrance.exitPoint.position, timeExit));
 
 		seq.Insert(0, cam.transform.DOMove(this.cylinders.position + cam.abovegroundOffset, timeAscend));
 		seq.Insert(0, cam.transform.DORotate(cam.abovegroundRotation, timeAscend));
 
-		seq.Insert(0, transform.DORotate(new Vector3(0, 0, 0), timeAscend));
+		seq.Insert(0, transform.DORotate(Vector3.zero, timeAscend));
 
 		seq.Insert(0, transform.GetChild(0).DOScale(1.0f, timeAscend));
 
