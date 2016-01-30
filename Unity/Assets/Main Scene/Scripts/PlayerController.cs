@@ -2,7 +2,7 @@
 using System.Collections;
 using DG.Tweening;
 
-enum MovementType
+public enum MovementType
 {
 	Normal, Cylinder, None
 }
@@ -19,7 +19,7 @@ public class PlayerController : MonoBehaviour
 	CameraController cam;
 
 	MovementType _movementType;
-	MovementType movementType
+	public MovementType movementType
 	{
 		set
 		{

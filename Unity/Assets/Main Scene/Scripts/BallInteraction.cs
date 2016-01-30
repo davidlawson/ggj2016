@@ -1,10 +1,13 @@
 ﻿using UnityEngine;
 using System.Collections;
 using UnityEngine.UI;
+using UnityEngine.EventSystems;
 
 public class BallInteraction : MonoBehaviour 
 {
 	GameObject ball;
+	Animator anim;
+	PlayerController player;
 
 	public Text pickupText;
 	public Text dropText;
@@ -31,38 +34,56 @@ public class BallInteraction : MonoBehaviour
 		{
 			_carryingBall = value;
 			this.dropText.enabled = _carryingBall;
-
-			//ball.GetComponentInChildren<SpriteRenderer>().enabled = !_carryingBall;
-			ball.SetActive(!_carryingBall);
-
-			if (!_carryingBall)
-			{
-				Vector3 newPos = ball.transform.position;
-				newPos.x = transform.position.x;
-				newPos.z = transform.position.z;
-				newPos += dropOffset;
-				ball.transform.position = newPos;
-			}
 		}
+	}
+
+	void PutRockDown()
+	{
+		carryingBall = false;
+		player.movementType = MovementType.None;
+		anim.SetTrigger("PutRockDown");
+	}
+
+	public void PutRockDownCompletion()
+	{
+		player.movementType = MovementType.Normal;
+
+		Vector3 newPos = ball.transform.position;
+		newPos.x = transform.position.x;
+		newPos.z = transform.position.z;
+		newPos += dropOffset;
+		ball.transform.position = newPos;
+
+		ball.SetActive(true);
+	}
+
+	void PickUpRock()
+	{
+		ball.SetActive(false);
+		canPickup = false;
+		carryingBall = true;
 	}
 
 	void Start()
 	{
 		this.ball = GameObject.FindWithTag("Ball");
+		this.player = GetComponent<PlayerController>();
+
+		GameObject charSprite = transform.FindChild("Character Sprite").gameObject;
+		anim = charSprite.GetComponent<Animator>();
 	}
 
 	void Update()
 	{
-		if (Input.GetKeyDown("e"))
+		if (Input.GetKeyDown("e") && player.movementType == MovementType.Normal)
 		{
 			if (canPickup)
 			{
-				canPickup = false;
-				carryingBall = true;
+				PickUpRock();
 			}
 			else if (carryingBall)
 			{
-				carryingBall = false;
+				PutRockDown();
 			}
 		}
 
