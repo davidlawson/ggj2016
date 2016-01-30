@@ -6,12 +6,14 @@ public class CylinderMovement : MonoBehaviour
 {
 	public Transform pivot;
 
-	public float movementSpeed;
+	public float upDownSpeed = 0.08f, leftRightSpeed = 0.04f;
 
 	Vector2 movementDirection;
 	Direction controlDirection;
 
 	public WaypointScript currentWaypoint = null;
+
+	public WaypointScript waypointQuickFix = null;
 
 	bool canCollide = true;
 
@@ -40,11 +42,29 @@ public class CylinderMovement : MonoBehaviour
 		anim = charSprite.GetComponent<Animator>();
 	}
 
+	void OnTriggerEnter(Collider other)
+	{
+		if (!this.enabled)
+			return;
+
+		WaypointScript waypoint = other.GetComponent<WaypointScript>();
+
+		if (!waypoint)
+			return;
+
+		waypointQuickFix = waypoint;
+	}
+
 	void OnTriggerStay(Collider other)
 	{
 		if (!this.enabled)
 			return;
-		
+
+		WaypointScript waypoint = other.GetComponent<WaypointScript>();
+
+		if (!waypoint)
+			return;
+
 		if (canCollide)
 		{
 			float distance = (other.transform.position - transform.position).magnitude;
@@ -61,6 +81,8 @@ public class CylinderMovement : MonoBehaviour
 	{
 		if (!this.enabled)
 			return;
+
+		waypointQuickFix = null;
 		
 		canCollide = true;
 	}
@@ -95,6 +117,8 @@ public class CylinderMovement : MonoBehaviour
 				player.transform.GetChild(0).localScale = Vector3.one;
 				player.transform.localEulerAngles = Vector3.zero;
 
+				anim.SetTrigger("ReturnedToGround");
+
 				this.cameraController.cameraMode = CameraMode.AboveGround;
 				player.movementType = MovementType.Normal;
 			});
@@ -124,6 +148,19 @@ public class CylinderMovement : MonoBehaviour
 	void FixedUpdate()
 	{
 		Direction dir = GetInputDirection();
+
+		if (waypointQuickFix && waypointQuickFix.leftTarget && waypointQuickFix.rightTarget && waypointQuickFix.upTarget && dir == Direction.Up)
+		{
+			transform.position = waypointQuickFix.transform.position;
+			currentWaypoint = waypointQuickFix;
+			waypointQuickFix = null;
+		}
+		else if (waypointQuickFix && waypointQuickFix.leftTarget && waypointQuickFix.rightTarget && waypointQuickFix.downTarget && dir == Direction.Down)
+		{
+			transform.position = waypointQuickFix.transform.position;
+			currentWaypoint = waypointQuickFix;
+			waypointQuickFix = null;
+		}
 
 		if (currentWaypoint != null)
 		{
@@ -157,14 +194,24 @@ public class CylinderMovement : MonoBehaviour
 			if (dir == controlDirection)
 			{
 				//Debug.Log("Moving Fowards");
-				Move(movementDirection);
+
+				if (dir == Direction.Up || dir == Direction.Down)
+					Move(movementDirection * upDownSpeed);
+				else
+					Move(movementDirection * leftRightSpeed);
+				
 				AnimateMove(dir);
 			}
 			else if (dir == controlDirection.Opposite())
 			{
 				//Debug.Log("Moving Backwards");
 				canCollide = true;
-				Move(-movementDirection);
+
+				if (dir == Direction.Up || dir == Direction.Down)
+					Move(-movementDirection * upDownSpeed);
+				else
+					Move(-movementDirection * leftRightSpeed);
+
 				AnimateMove(dir);
 			}
 		}
@@ -214,9 +261,9 @@ public class CylinderMovement : MonoBehaviour
 	{
 		float radius = pivot.localScale.x / 2;
 
-		float radialSpeed = movementSpeed / radius;
+		float radialSpeed = 1.0f / radius;
 
 		transform.RotateAround(this.pivot.position, Vector3.up, radialSpeed * direction.x * Mathf.Rad2Deg);
-		transform.Translate(new Vector3(0, direction.y * this.movementSpeed, 0));
+		transform.Translate(new Vector3(0, direction.y, 0));
 	}
 }

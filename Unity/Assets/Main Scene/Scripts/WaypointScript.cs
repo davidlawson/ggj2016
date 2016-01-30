@@ -36,6 +36,11 @@ public class WaypointScript : MonoBehaviour
 		float theta = Mathf.Atan2(target.transform.localPosition.z, target.transform.localPosition.x)
 		              - Mathf.Atan2(transform.localPosition.z, transform.localPosition.x);
 
+		if (theta < -Mathf.PI)
+			theta += Mathf.PI * 2;
+		else if (theta > Mathf.PI)
+			theta -= Mathf.PI * 2;
+
 		return new Vector2(
 			-r * theta,
 			target.transform.position.y - transform.position.y
