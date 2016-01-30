@@ -7,7 +7,7 @@ public class ManualBillboard : MonoBehaviour
 
 	void Start()
 	{
-		cam = GameObject.Find("Main Camera").GetComponent<Camera>();
+		cam = GameObject.FindWithTag("MainCamera").GetComponent<Camera>();
 	}
 
 	void Update()
