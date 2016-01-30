@@ -37,14 +37,14 @@ public class BallInteraction : MonoBehaviour
 		}
 	}
 
-	void PutRockDown()
+	void PutDownRock()
 	{
 		carryingBall = false;
 		player.movementType = MovementType.None;
-		anim.SetTrigger("PutRockDown");
+		anim.SetTrigger("PutDownRock");
 	}
 
-	public void PutRockDownAlmost()
+	public void PutDownRockAlmost()
 	{
 		Vector3 newPos = ball.transform.position;
 		newPos.x = transform.position.x;
@@ -55,16 +55,24 @@ public class BallInteraction : MonoBehaviour
 		ball.SetActive(true);
 	}
 
-	public void PutRockDownCompletion()
+	public void PutDownRockCompletion()
 	{
 		player.movementType = MovementType.Normal;
 	}
 
 	void PickUpRock()
 	{
+		player.movementType = MovementType.None;
+
+		anim.SetTrigger("PickUpRock");
 		ball.SetActive(false);
 		canPickup = false;
 		carryingBall = true;
+	}
+
+	public void PickUpRockCompletion()
+	{
+		player.movementType = MovementType.Normal;
 	}
 
 	void Start()
@@ -86,7 +94,7 @@ public class BallInteraction : MonoBehaviour
 			}
 			else if (carryingBall)
 			{
-				PutRockDown();
+				PutDownRock();
 			}
 		}
 	}

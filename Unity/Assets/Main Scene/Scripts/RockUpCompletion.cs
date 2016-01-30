@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class RockDownCompletion : StateMachineBehaviour {
+public class RockUpCompletion : StateMachineBehaviour {
 
 	 // OnStateEnter is called when a transition starts and the state machine starts to evaluate this state
 	//override public void OnStateEnter(Animator animator, AnimatorStateInfo stateInfo, int layerIndex) {
@@ -15,7 +15,7 @@ public class RockDownCompletion : StateMachineBehaviour {
 
 	// OnStateExit is called when a transition ends and the state machine finishes evaluating this state
 	override public void OnStateExit(Animator animator, AnimatorStateInfo stateInfo, int layerIndex) {
-		GameObject.FindGameObjectWithTag("Player").GetComponent<BallInteraction>().PutDownRockCompletion();
+		GameObject.FindGameObjectWithTag("Player").GetComponent<BallInteraction>().PickUpRockCompletion();
 	}
 
 	// OnStateMove is called right after Animator.OnAnimatorMove(). Code that processes and affects root motion should be implemented here

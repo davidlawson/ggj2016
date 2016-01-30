@@ -3,8 +3,8 @@ using System.Collections;
 
 public class PlayerAnimation : MonoBehaviour {
 
-	public void PutRockDownAlmost()
+	public void PutDownRockAlmost()
 	{
-		GetComponentInParent<BallInteraction>().PutRockDownAlmost();
+		GetComponentInParent<BallInteraction>().PutDownRockAlmost();
 	}
 }
