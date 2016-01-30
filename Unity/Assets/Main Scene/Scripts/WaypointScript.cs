@@ -5,6 +5,7 @@ public class WaypointScript : MonoBehaviour
 {
 	public WaypointScript leftTarget, rightTarget, upTarget, downTarget;
 	public UndergroundEntrance upExit;
+	public bool ropeOnLeft;
 
 	public Vector2 GetDirection(Direction direction)
 	{

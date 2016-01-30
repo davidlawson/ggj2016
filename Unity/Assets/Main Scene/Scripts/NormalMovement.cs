@@ -21,7 +21,7 @@ public class NormalMovement : MonoBehaviour
 
 	void Awake() 
 	{
-		GameObject charSprite = transform.FindChild("Character Sprite").gameObject;
+		GameObject charSprite = transform.GetChild(0).FindChild("Character Sprite").gameObject;
 
 		rb = GetComponent<Rigidbody>();
 		anim = charSprite.GetComponent<Animator>();

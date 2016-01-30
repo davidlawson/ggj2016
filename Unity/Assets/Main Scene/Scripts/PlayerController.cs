@@ -13,6 +13,8 @@ public enum MovementType
 
 public class PlayerController : MonoBehaviour 
 {
+	public float insideScale = 0.7f;
+
 	CylinderMovement cylinderMovement;
 	NormalMovement normalMovement;
 	Rigidbody rigidBody;
@@ -66,12 +68,12 @@ public class PlayerController : MonoBehaviour
 		this.cylinders = GameObject.Find("Cylinders").transform;
 
 		this.eyeObjects = new GameObject[] {
-			transform.FindChild("Left Eye").gameObject,
-			transform.FindChild("Right Eye").gameObject,
-			transform.FindChild("Eye Whites Sprite").gameObject
+			transform.GetChild(0).FindChild("Left Eye").gameObject,
+			transform.GetChild(0).FindChild("Right Eye").gameObject,
+			transform.GetChild(0).FindChild("Eye Whites Sprite").gameObject
 		};
 
-		GameObject charSprite = transform.FindChild("Character Sprite").gameObject;
+		GameObject charSprite = transform.GetChild(0).FindChild("Character Sprite").gameObject;
 		anim = charSprite.GetComponent<Animator>();
 
 		movementType = MovementType.Normal;
@@ -79,7 +81,8 @@ public class PlayerController : MonoBehaviour
 
 	void Update()
 	{
-		bool idle = anim.GetCurrentAnimatorStateInfo(0).IsName("Base Layer.IdleNoRockAnimation");
+		bool idle = anim.GetCurrentAnimatorStateInfo(0).IsName("Base Layer.IdleNoRockAnimation")
+			|| anim.GetCurrentAnimatorStateInfo(0).IsName("Base Layer.IdleUnderground");
 		ShowMovingEyes(idle);
 	}
 
@@ -127,7 +130,19 @@ public class PlayerController : MonoBehaviour
 
 		seq.Insert(timeEntrance + timeWait, transform.DORotateQuaternion(camRotation, timeDescend));
 
+		seq.Insert(timeEntrance + timeWait, transform.GetChild(0).DOScale(this.insideScale, timeDescend));
+
+		seq.InsertCallback(timeEntrance + timeWait, () => {
+			anim.SetBool("Walking", false);
+			anim.SetBool("Climbing", true);
+			anim.SetBool("ClimbingUp", false);
+			anim.SetTrigger("BeginClimbing");
+
+			transform.localScale = new Vector3(waypoint.ropeOnLeft ? 1 : -1, 1, 1);
+		});
+
 		seq.AppendCallback(() => {
+			anim.SetBool("Climbing", false);
 			movementType = MovementType.Cylinder;
 			cam.pivot = pivot;
 			cylinderMovement.pivot = pivot;
@@ -144,6 +159,9 @@ public class PlayerController : MonoBehaviour
 		float timeWait = 0.3f;
 		float timeExit = 0.5f;
 
+		anim.SetBool("Climbing", true);
+		anim.SetBool("ClimbingUp", true);
+
 		Sequence seq = DOTween.Sequence();
 
 		seq.Append(transform.DOMove(entrance.transform.position, timeAscend));
@@ -154,6 +172,12 @@ public class PlayerController : MonoBehaviour
 		seq.Insert(0, cam.transform.DORotate(cam.abovegroundRotation, timeAscend));
 
 		seq.Insert(0, transform.DORotate(new Vector3(0, 0, 0), timeAscend));
+
+		seq.Insert(0, transform.GetChild(0).DOScale(1.0f, timeAscend));
+
+		seq.InsertCallback(timeAscend, () => {
+			anim.SetTrigger("ReturnedToGround");
+		});
 
 		seq.AppendCallback(() => {
 			movementType = MovementType.Normal;

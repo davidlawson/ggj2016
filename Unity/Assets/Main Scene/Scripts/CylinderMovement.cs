@@ -15,6 +15,7 @@ public class CylinderMovement : MonoBehaviour
 	bool canCollide = true;
 
 	PlayerController player;
+	Animator anim;
 
 	void OnTriggerStay(Collider other)
 	{
@@ -52,20 +53,23 @@ public class CylinderMovement : MonoBehaviour
 	void Start()
 	{
 		this.player = GetComponent<PlayerController>();
+
+		GameObject charSprite = transform.GetChild(0).FindChild("Character Sprite").gameObject;
+		anim = charSprite.GetComponent<Animator>();
 	}
 
 	Direction GetInputDirection()
 	{
 		Direction dir = Direction.None;
 
-		if (Input.GetKey("left") || Input.GetKey("a"))
-			dir = Direction.Left;
-		else if (Input.GetKey("right") || Input.GetKey("d"))
-			dir = Direction.Right;
-		else if (Input.GetKey("up") || Input.GetKey("w"))
+		if (Input.GetKey("up") || Input.GetKey("w"))
 			dir = Direction.Up;
 		else if (Input.GetKey("down") || Input.GetKey("s"))
 			dir = Direction.Down;
+		else if (Input.GetKey("left") || Input.GetKey("a"))
+			dir = Direction.Left;
+		else if (Input.GetKey("right") || Input.GetKey("d"))
+			dir = Direction.Right;
 
 		return dir;
 	}
@@ -89,6 +93,11 @@ public class CylinderMovement : MonoBehaviour
 				{
 					//Debug.Log("Leaving Waypoint");
 
+					if (dir == Direction.Up || dir == Direction.Down)
+					{
+						transform.localScale = new Vector3(currentWaypoint.ropeOnLeft ? 1 : -1, 1, 1);
+					}
+
 					movementDirection = possibleDirection;
 					controlDirection = dir;
 					currentWaypoint = null;
@@ -102,13 +111,53 @@ public class CylinderMovement : MonoBehaviour
 			{
 				//Debug.Log("Moving Fowards");
 				Move(movementDirection);
+				AnimateMove(dir);
 			}
 			else if (dir == controlDirection.Opposite())
 			{
 				//Debug.Log("Moving Backwards");
 				canCollide = true;
 				Move(-movementDirection);
+				AnimateMove(dir);
 			}
+		}
+
+		if (dir == Direction.None)
+		{
+			AnimateMove(dir);
+		}
+	}
+
+	void AnimateMove(Direction dir)
+	{
+		if (dir == Direction.Up)
+		{
+			anim.SetBool("Walking", false);
+			anim.SetBool("Climbing", true);
+			anim.SetBool("ClimbingUp", true);
+		}
+		else if (dir == Direction.Down)
+		{
+			anim.SetBool("Walking", false);
+			anim.SetBool("Climbing", true);
+			anim.SetBool("ClimbingUp", false);
+		}
+		else if (dir == Direction.Left)
+		{
+			anim.SetBool("Climbing", false);
+			anim.SetBool("Walking", true);
+			transform.localScale = new Vector3(-1, 1, 1);
+		}
+		else if (dir == Direction.Right)
+		{
+			anim.SetBool("Climbing", false);
+			anim.SetBool("Walking", true);
+			transform.localScale = new Vector3(1, 1, 1);
+		}
+		else
+		{
+			anim.SetBool("Climbing", false);
+			anim.SetBool("Walking", false);
 		}
 	}
 

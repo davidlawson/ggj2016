@@ -36,34 +36,46 @@ public class BallInteraction : MonoBehaviour
 		this.dropText.enabled = false;
 		player.movementType = MovementType.None;
 		anim.SetTrigger("PutDownRock");
+
+		Vector3 newPos = ball.transform.position;
+		newPos.x = transform.position.x;
+		newPos.y = cylinderController.transform.position.y;
+		newPos.z = transform.position.z;
+
+		Vector3 offset;
+
+		if (transform.localScale.x > 0)
+			offset = dropOffset;
+		else
+			offset = -dropOffset;
+
+		newPos += offset;
+
+		cylinderController.enabled = false;
+		cylinderController.transform.DOMove(newPos, 1.0f);
 	}
 
 	public void PutDownRockAlmost()
 	{
-		//todo temp!!!
-		if (carryingBall)
-			return;
-		
 		Vector3 newPos = ball.transform.position;
 		newPos.x = transform.position.x;
 		newPos.z = transform.position.z;
 
+		Vector3 offset;
+
 		if (transform.localScale.x > 0)
-			newPos += dropOffset;
+			offset = dropOffset;
 		else
-			newPos -= dropOffset;
+			offset = -dropOffset;
+
+		newPos += offset;
 		
 		ball.transform.position = newPos;
 
 		ball.SetActive(true);
 
-		cylinderController.enabled = false;
-
-		Sequence seq = DOTween.Sequence();
-		seq.Append(cylinderController.transform.DOMove(new Vector3(ball.transform.position.x, 0, ball.transform.position.z), 0.5f));
-		seq.AppendCallback(() => {
-			cylinderController.enabled = true;
-		});
+		cylinderController.enabled = true;
+		transform.DOMove(transform.position - offset, 0.5f);
 	}
 
 	public void PutDownRockCompletion()
@@ -96,7 +108,7 @@ public class BallInteraction : MonoBehaviour
 		this.player = GetComponent<PlayerController>();
 		this.cylinderController = GameObject.Find("Cylinders").GetComponent<CylinderController>();
 
-		GameObject charSprite = transform.FindChild("Character Sprite").gameObject;
+		GameObject charSprite = transform.GetChild(0).FindChild("Character Sprite").gameObject;
 		anim = charSprite.GetComponent<Animator>();
 	}
 
