@@ -27,21 +27,13 @@ public class BallInteraction : MonoBehaviour
 
 		get { return _canPickup; }
 	}
-
-	bool _carryingBall;
-	bool carryingBall
-	{
-		get { return _carryingBall; }
-		set
-		{
-			_carryingBall = value;
-			this.dropText.enabled = _carryingBall;
-		}
-	}
+		
+	bool carryingBall;
 
 	void PutDownRock()
 	{
 		carryingBall = false;
+		this.dropText.enabled = false;
 		player.movementType = MovementType.None;
 		anim.SetTrigger("PutDownRock");
 	}
@@ -95,6 +87,7 @@ public class BallInteraction : MonoBehaviour
 	public void PickUpRockCompletion()
 	{
 		player.movementType = MovementType.Normal;
+		this.dropText.enabled = true;
 	}
 
 	void Start()

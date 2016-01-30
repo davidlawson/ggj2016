@@ -46,15 +46,9 @@ public class NormalMovement : MonoBehaviour
 				{
 					transform.localScale = new Vector3(-1, 1, 1);
 				}
-
-				if (targetVelocity.z > 0)
-				{
-					anim.SetBool("FacingAway", true);	
-				}
-				else
-				{
-					anim.SetBool("FacingAway", false);
-				}
+					
+				anim.SetBool("FacingAway", targetVelocity.z > 0);	
+				anim.SetBool("MovingSideways", targetVelocity.x > 0 || targetVelocity.x < 0);
 
 				targetVelocity.Normalize();
 				//targetVelocity = transform.TransformDirection(targetVelocity);
