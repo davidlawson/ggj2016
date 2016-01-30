@@ -9,6 +9,8 @@ public class NormalMovement : MonoBehaviour
 	Rigidbody rb;
 	Animator anim;
 
+	GameObject[] eyeObjects;
+
 	public float speed = 10.0f;
 	public float gravity = 20.0f;
 	public float maxVelocityChange = 1.0f;
@@ -22,17 +24,14 @@ public class NormalMovement : MonoBehaviour
 	void Awake() 
 	{
 		GameObject charSprite = transform.FindChild("Character Sprite").gameObject;
+		this.eyeObjects = new GameObject[] {
+			transform.FindChild("Left Eye").gameObject,
+			transform.FindChild("Right Eye").gameObject,
+			transform.FindChild("Eye Whites Sprite").gameObject
+		};
 
 		rb = GetComponent<Rigidbody>();
 		anim = charSprite.GetComponent<Animator>();
-	}
-
-	void Update()
-	{
-		//transform.localEulerAngles += new Vector3(0, Input.GetAxis("Mouse X"), 0) * mouseSensitivity;
-		//Vector3 desiredRotation = cam.transform.localEulerAngles + new Vector3(-Input.GetAxis("Mouse Y"), 0, 0) * mouseSensitivity;
-		//desiredRotation.x = ClampAngle(desiredRotation.x, mouseXMin, mouseXMax);
-		//cam.transform.localRotation = Quaternion.Euler(desiredRotation);
 	}
 	
 	void FixedUpdate()
@@ -45,6 +44,25 @@ public class NormalMovement : MonoBehaviour
 			if (targetVelocity.magnitude > 0)
 			{
 				anim.SetBool("Walking", true);
+				ShowMovingEyes(false);
+
+				if (targetVelocity.x > 0)
+				{
+					transform.localScale = new Vector3(1, 1, 1);
+				}
+				else if (targetVelocity.x < 0)
+				{
+					transform.localScale = new Vector3(-1, 1, 1);
+				}
+
+				if (targetVelocity.z > 0)
+				{
+					anim.SetBool("FacingAway", true);	
+				}
+				else
+				{
+					anim.SetBool("FacingAway", false);
+				}
 
 				targetVelocity.Normalize();
 				//targetVelocity = transform.TransformDirection(targetVelocity);
@@ -61,6 +79,7 @@ public class NormalMovement : MonoBehaviour
 			else
 			{
 				anim.SetBool("Walking", false);
+				ShowMovingEyes(true);
 			}
 		}
 
@@ -68,12 +87,12 @@ public class NormalMovement : MonoBehaviour
 		rb.AddForce(new Vector3 (0, -gravity * rb.mass, 0));
 		
 		grounded = false;
+	}
 
-		float flipTolerance = 0.1f;
-		if (rb.velocity.x < -flipTolerance)
-			transform.localScale = new Vector3(-1, 1, 1);
-		else if (rb.velocity.x > flipTolerance)
-			transform.localScale = new Vector3(1, 1, 1);
+	void ShowMovingEyes(bool show)
+	{
+		for (int i = 0; i < eyeObjects.Length; i++)
+			eyeObjects[i].SetActive(show);
 	}
 	
 	void OnCollisionStay(Collision collisionInfo) 
