@@ -87,12 +87,10 @@ public class PlayerController : MonoBehaviour
 		seq.AppendInterval(timeWait);
 		seq.Append(transform.DOMove(waypoint.transform.position, timeDescend));
 
-		float distance = 10;
-
 		Vector3 waypointPos = waypoint.transform.position;
 		Vector3 pivotPoint = new Vector3(pivot.position.x, waypointPos.y, pivot.position.z);
 		Vector3 radialVector = (waypointPos - pivotPoint).normalized;
-		Vector3 camPoint = waypointPos + radialVector * distance;
+		Vector3 camPoint = waypointPos + radialVector * cam.undergroundDistance;
 
 		Quaternion camRotation = Quaternion.LookRotation(-radialVector);
 
