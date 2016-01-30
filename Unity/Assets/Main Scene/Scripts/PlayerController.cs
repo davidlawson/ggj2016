@@ -18,6 +18,9 @@ public class PlayerController : MonoBehaviour
 	Rigidbody rigidBody;
 	CameraController cam;
 
+	Animator anim;
+	GameObject[] eyeObjects;
+
 	MovementType _movementType;
 	public MovementType movementType
 	{
@@ -58,7 +61,29 @@ public class PlayerController : MonoBehaviour
 		this.rigidBody = GetComponent<Rigidbody>();
 		this.cam = GameObject.FindGameObjectWithTag("MainCamera").GetComponent<CameraController>();
 
+		this.eyeObjects = new GameObject[] {
+			transform.FindChild("Left Eye").gameObject,
+			transform.FindChild("Right Eye").gameObject,
+			transform.FindChild("Eye Whites Sprite").gameObject
+		};
+
+		GameObject charSprite = transform.FindChild("Character Sprite").gameObject;
+		anim = charSprite.GetComponent<Animator>();
+
 		movementType = MovementType.Normal;
+	}
+
+	void Update()
+	{
+		bool idle = anim.GetCurrentAnimatorStateInfo(0).IsName("Base Layer.IdleNoRockAnimation");
+		Debug.Log(idle);
+		ShowMovingEyes(idle);
+	}
+
+	void ShowMovingEyes(bool show)
+	{
+		for (int i = 0; i < eyeObjects.Length; i++)
+			eyeObjects[i].SetActive(show);
 	}
 
 	void OnTriggerEnter(Collider other)

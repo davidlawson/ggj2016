@@ -9,8 +9,6 @@ public class NormalMovement : MonoBehaviour
 	Rigidbody rb;
 	Animator anim;
 
-	GameObject[] eyeObjects;
-
 	public float speed = 10.0f;
 	public float gravity = 20.0f;
 	public float maxVelocityChange = 1.0f;
@@ -24,11 +22,6 @@ public class NormalMovement : MonoBehaviour
 	void Awake() 
 	{
 		GameObject charSprite = transform.FindChild("Character Sprite").gameObject;
-		this.eyeObjects = new GameObject[] {
-			transform.FindChild("Left Eye").gameObject,
-			transform.FindChild("Right Eye").gameObject,
-			transform.FindChild("Eye Whites Sprite").gameObject
-		};
 
 		rb = GetComponent<Rigidbody>();
 		anim = charSprite.GetComponent<Animator>();
@@ -44,7 +37,6 @@ public class NormalMovement : MonoBehaviour
 			if (targetVelocity.magnitude > 0)
 			{
 				anim.SetBool("Walking", true);
-				ShowMovingEyes(false);
 
 				if (targetVelocity.x > 0)
 				{
@@ -79,7 +71,6 @@ public class NormalMovement : MonoBehaviour
 			else
 			{
 				anim.SetBool("Walking", false);
-				ShowMovingEyes(true);
 			}
 		}
 
@@ -87,12 +78,6 @@ public class NormalMovement : MonoBehaviour
 		rb.AddForce(new Vector3 (0, -gravity * rb.mass, 0));
 		
 		grounded = false;
-	}
-
-	void ShowMovingEyes(bool show)
-	{
-		for (int i = 0; i < eyeObjects.Length; i++)
-			eyeObjects[i].SetActive(show);
 	}
 	
 	void OnCollisionStay(Collision collisionInfo) 

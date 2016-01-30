@@ -44,10 +44,8 @@ public class BallInteraction : MonoBehaviour
 		anim.SetTrigger("PutRockDown");
 	}
 
-	public void PutRockDownCompletion()
+	public void PutRockDownAlmost()
 	{
-		player.movementType = MovementType.Normal;
-
 		Vector3 newPos = ball.transform.position;
 		newPos.x = transform.position.x;
 		newPos.z = transform.position.z;
@@ -55,6 +53,11 @@ public class BallInteraction : MonoBehaviour
 		ball.transform.position = newPos;
 
 		ball.SetActive(true);
+	}
+
+	public void PutRockDownCompletion()
+	{
+		player.movementType = MovementType.Normal;
 	}
 
 	void PickUpRock()
@@ -86,7 +89,6 @@ public class BallInteraction : MonoBehaviour
 				PutRockDown();
 			}
 		}
-
 	}
 	
 	void OnTriggerEnter(Collider col)
