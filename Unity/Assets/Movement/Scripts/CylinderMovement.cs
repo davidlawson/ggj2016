@@ -43,7 +43,7 @@ public class CylinderMovement : MonoBehaviour
 
 	void Collide(Collider other)
 	{
-		Debug.Log("Hit Waypoint");
+		//Debug.Log("Hit Waypoint");
 
 		currentWaypoint = other.GetComponent<WaypointScript>();
 		transform.position = currentWaypoint.transform.position;
@@ -58,13 +58,13 @@ public class CylinderMovement : MonoBehaviour
 	{
 		Direction dir = Direction.None;
 
-		if (Input.GetKey("left"))
+		if (Input.GetKey("left") || Input.GetKey("a"))
 			dir = Direction.Left;
-		else if (Input.GetKey("right"))
+		else if (Input.GetKey("right") || Input.GetKey("d"))
 			dir = Direction.Right;
-		else if (Input.GetKey("up"))
+		else if (Input.GetKey("up") || Input.GetKey("w"))
 			dir = Direction.Up;
-		else if (Input.GetKey("down"))
+		else if (Input.GetKey("down") || Input.GetKey("s"))
 			dir = Direction.Down;
 
 		return dir;
@@ -87,7 +87,7 @@ public class CylinderMovement : MonoBehaviour
 
 				if (possibleDirection != Vector2.zero)
 				{
-					Debug.Log("Leaving Waypoint");
+					//Debug.Log("Leaving Waypoint");
 
 					movementDirection = possibleDirection;
 					controlDirection = dir;
@@ -100,12 +100,12 @@ public class CylinderMovement : MonoBehaviour
 		{
 			if (dir == controlDirection)
 			{
-				Debug.Log("Moving Fowards");
+				//Debug.Log("Moving Fowards");
 				Move(movementDirection);
 			}
 			else if (dir == controlDirection.Opposite())
 			{
-				Debug.Log("Moving Backwards");
+				//Debug.Log("Moving Backwards");
 				canCollide = true;
 				Move(-movementDirection);
 			}

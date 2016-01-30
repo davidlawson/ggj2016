@@ -1,6 +1,5 @@
 ﻿using UnityEngine;
 using System.Collections;
-using DG;
 using DG.Tweening;
 
 enum MovementType

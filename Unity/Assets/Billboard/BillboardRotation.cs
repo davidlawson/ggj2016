@@ -7,12 +7,12 @@ public class BillboardRotation : MonoBehaviour
 	public List<Sprite> sprites;
 
 	Transform player;
-	SpriteRenderer renderer;
+	SpriteRenderer rend;
 
 	void Start()
 	{
 		this.player = GameObject.FindWithTag("Player").transform;
-		this.renderer = GetComponentInChildren<SpriteRenderer>();
+		this.rend = GetComponentInChildren<SpriteRenderer>();
 	}
 
 	void Update()
@@ -23,7 +23,7 @@ public class BillboardRotation : MonoBehaviour
 		float angle = Mathf.Repeat(GetAngle() + 180 + (360 / this.sprites.Count / 2), 360);
 
 		int index = Mathf.FloorToInt(this.sprites.Count * angle / 360);
-		this.renderer.sprite = sprites[index];
+		this.rend.sprite = sprites[index];
 	}
 
 	float GetAngle()
