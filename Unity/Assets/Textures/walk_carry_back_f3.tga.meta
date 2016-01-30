@@ -1,23 +1,11 @@
 fileFormatVersion: 2
-<<<<<<< b54fecbf30a3a204934018b46325bb9ae6240c32
 guid: e086ae7701ffd40259f02896c880002e
-timeCreated: 1454131208
-licenseType: Free
-=======
-guid: b8e3fb557f0bf284aa0ac40a63a725a2
-timeCreated: 1454131099
-licenseType: Pro
->>>>>>> tunnels magic
 TextureImporter:
   fileIDToRecycleName: {}
   serializedVersion: 2
   mipmaps:
     mipMapMode: 0
-<<<<<<< b54fecbf30a3a204934018b46325bb9ae6240c32
-    enableMipMap: 0
-=======
     enableMipMap: 1
->>>>>>> tunnels magic
     linearTexture: 0
     correctGamma: 0
     fadeOut: 0
@@ -37,38 +25,17 @@ TextureImporter:
   cubemapConvolutionExponent: 1.5
   seamlessCubemap: 0
   textureFormat: -1
-<<<<<<< b54fecbf30a3a204934018b46325bb9ae6240c32
-  maxTextureSize: 1024
+  maxTextureSize: 2048
   textureSettings:
     filterMode: -1
     aniso: -1
     mipBias: -1
-    wrapMode: 1
-  nPOTScale: 0
-=======
-  maxTextureSize: 2048
-  textureSettings:
-    filterMode: 0
-    aniso: -1
-    mipBias: -1
     wrapMode: -1
   nPOTScale: 1
->>>>>>> tunnels magic
   lightmap: 0
   rGBM: 0
   compressionQuality: 50
   allowsAlphaSplitting: 0
-<<<<<<< b54fecbf30a3a204934018b46325bb9ae6240c32
-  spriteMode: 1
-  spriteExtrude: 1
-  spriteMeshType: 1
-  alignment: 9
-  spritePivot: {x: 0.5, y: 0.46}
-  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
-  spritePixelsToUnits: 400
-  alphaIsTransparency: 1
-  textureType: 8
-=======
   spriteMode: 0
   spriteExtrude: 1
   spriteMeshType: 1
@@ -78,7 +45,6 @@ TextureImporter:
   spritePixelsToUnits: 100
   alphaIsTransparency: 0
   textureType: -1
->>>>>>> tunnels magic
   buildTargetSettings: []
   spriteSheet:
     sprites: []
