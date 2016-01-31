@@ -18,4 +18,9 @@ public class CreditsController : MonoBehaviour
 		DOTween.To(() => cameraBlur.Amount, x => cameraBlur.Amount = x, 1.0f, 3.0f);
 		canvasGroup.DOFade(1.0f, 3.0f);
 	}
+
+	public void OpenLink(string URL)
+	{
+		Application.OpenURL(URL);
+	}
 }
