@@ -12,6 +12,8 @@ public class CreditsController : MonoBehaviour
 	{
 		GameObject.FindWithTag("Player").GetComponent<PlayerController>().movementType = MovementType.None;
 
+		canvasGroup.interactable = true;
+
 		cameraBlur.Amount = 0;
 		cameraBlur.enabled = true;
 
