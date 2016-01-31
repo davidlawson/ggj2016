@@ -33,7 +33,7 @@ public class UndergroundTrigger : MonoBehaviour
 
 	public void AnimateHiding()
 	{
-		outsideTransform.DOMoveY(1, 2.0f);
+		outsideTransform.DOMoveY(2, 2.0f);
 		foreach (Material mat in insideRenderer.materials)
 		{
 			if (mat.name.Contains("Grass"))
