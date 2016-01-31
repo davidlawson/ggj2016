@@ -121,6 +121,11 @@ public class CylinderMovement : MonoBehaviour
 
 				this.cameraController.cameraMode = CameraMode.AboveGround;
 				player.movementType = MovementType.Normal;
+
+				GameObject.Find("GameState").GetComponent<GameState>().gemsCollected++;
+
+				ballInteraction.lastTrigger.GetComponent<MeshCollider>().enabled = false;
+				ballInteraction.lastTrigger.AnimateHiding();
 			});
 
 			soundController.PlayTeleport();

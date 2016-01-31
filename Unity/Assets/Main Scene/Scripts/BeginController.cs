@@ -25,8 +25,10 @@ public class BeginController : MonoBehaviour {
 		seq.Append(beginScreen.DOFade(0.0f, 3.0f));
 		seq.Insert(0, DOTween.To(() => cameraBlur.Amount, x => cameraBlur.Amount = x, 0.0f, 3.0f));
 
-		seq.AppendCallback(() => {
-			GameObject.FindWithTag("Player").GetComponent<PlayerController>().movementType = MovementType.Normal;
-		});
+		GameObject.FindWithTag("Player").GetComponent<PlayerController>().movementType = MovementType.Normal;
+
+		//seq.AppendCallback(() => {
+			
+		//});
 	}
 }
