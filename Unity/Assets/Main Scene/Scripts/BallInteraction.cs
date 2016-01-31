@@ -13,7 +13,8 @@ public class BallInteraction : MonoBehaviour
 
 	SoundController soundController;
 
-	UndergroundTrigger insideTrigger;
+	public UndergroundTrigger lastTrigger;
+	public UndergroundTrigger insideTrigger;
 
 	public Text pickupText;
 	public Text dropText;
@@ -158,7 +159,10 @@ public class BallInteraction : MonoBehaviour
 
 		UndergroundTrigger trig = col.GetComponent<UndergroundTrigger>();
 		if (trig)
+		{
 			insideTrigger = trig;
+			lastTrigger = trig;
+		}
 	}
 
 	void OnTriggerStay(Collider col)

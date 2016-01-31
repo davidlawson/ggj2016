@@ -76,7 +76,7 @@ public class PlayerController : MonoBehaviour
 		GameObject charSprite = transform.GetChild(0).FindChild("Character Sprite").gameObject;
 		anim = charSprite.GetComponent<Animator>();
 
-		movementType = MovementType.Normal;
+		movementType = MovementType.None;
 	}
 
 	void Update()
